@@ -133,3 +133,4 @@ dmypy.json
 
 # PyCharm Project Configuration
 .idea/
+.idea/*.xml
