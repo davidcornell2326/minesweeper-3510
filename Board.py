@@ -12,10 +12,4 @@ class Board:
                 self.grid[y].append(int(grid[(y * width) + x]))
 
     def __repr__(self):
-        lines = []
-        for line in self.grid:
-            line_arr = []
-            for num in line:
-                line_arr.append(str(num))
-            lines.append("".join(line_arr))
-        return "\n".join(lines)
+        return "\n".join([self.gridString[i:i+self.width] for i in range(0, len(self.gridString), self.width)])
