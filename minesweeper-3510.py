@@ -17,8 +17,8 @@ def load_board(testcase_path):
         data = json.load(f)
 
         dims = data['size'].split(',')
-        width = int(dims[0])
-        height = int(dims[1])
+        height = int(dims[0])
+        width = int(dims[1])
 
         startPos = data['safe'].split(',')
         startX = int(startPos[0])

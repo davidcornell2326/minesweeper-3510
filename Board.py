@@ -6,9 +6,16 @@ class Board:
         self.startY = startY
         self.bombCount = bombCount
         self.gridString = grid
-        # todo process grid
+        self.grid = [[] for _ in range(height)]
+        for y in range(height):
+            for x in range(width):
+                self.grid[y].append(int(grid[(y * width) + x]))
 
     def __repr__(self):
-        return "a " + str(self.width) + " x " + str(self.height) + \
-               " board starting at (" + str(self.startX) + "," + str(self.startY) + \
-               ") with " + str(self.bombCount) + " bombs. \n" + self.gridString
+        lines = []
+        for line in self.grid:
+            line_arr = []
+            for num in line:
+                line_arr.append(str(num))
+            lines.append("".join(line_arr))
+        return "\n".join(lines)
