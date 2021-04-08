@@ -135,4 +135,4 @@ dmypy.json
 .idea/
 .idea/*.xml
 /.idea/
-/idea/*.xml
+/.idea/*.xml
