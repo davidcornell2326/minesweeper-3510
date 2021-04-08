@@ -25,7 +25,7 @@
     </select>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="8c32a1f1-4b88-4404-9db9-6f59f04b61b7" name="Default Changelist" comment="Initialize repository" />
+    <list default="true" id="8c32a1f1-4b88-4404-9db9-6f59f04b61b7" name="Default Changelist" comment="Add environment" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -90,7 +90,14 @@
       <option name="project" value="LOCAL" />
       <updated>1617900204024</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add environment">
+      <created>1617900742854</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1617900742854</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -118,7 +125,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initialize repository" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initialize repository" />
+    <MESSAGE value="Add environment" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add environment" />
   </component>
   <component name="WindowStateProjectService">
     <state x="223" y="67" width="1089" height="737" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1617900141266">
@@ -145,9 +153,9 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state width="1515" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1617900161547" />
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1617900454608">
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2" timestamp="1617900749349">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1617900454608" />
+    <state x="361" y="145" key="Vcs.Push.Dialog.v2/0.0.1536.824@0.0.1536.824" timestamp="1617900749349" />
   </component>
 </project>
