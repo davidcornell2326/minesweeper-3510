@@ -31,5 +31,7 @@ def load_board(testcase_path):
         return Board(width, height, startX, startY, bombCount, grid)
 
 
-board = load_board(testcase)
-print(board)
+# Main method
+if __name__ == "__main__":
+    board = load_board(testcase)
+    board.user_mode()
