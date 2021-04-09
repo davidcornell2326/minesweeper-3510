@@ -21,9 +21,10 @@ class Board:
         return top + "\n".join(str(i) + " | " + str(" ".join(str(self.grid[i][j] if self.grid[i][j] > -1 else ("*" if self.grid[i][j] == -1 else "X")) for j in range(self.width))) for i in range(self.height))
 
     def user_mode(self):
-        print("\nChoose a spot to \"click\" by entering the row and then column where prompted.\nAdd the letter \"m\" to the end of either of the two numbers to \"mark\" that spot instead of clicking it.")
+        print("\nChoose a spot to \"click\" by entering the row and then column where prompted.")
+        print("Add the letter \"m\" to the end of either of the two numbers to \"mark\" that spot instead of clicking it.")
         print("\nStarting spot: row " + str(self.start_x) + ", column " + str(self.start_y) + "\n")
-        while(self.playing):
+        while self.playing:
             print(self)
             row = input("Choose row: ")
             col = input("Choose column: ")
@@ -55,17 +56,18 @@ class Board:
                 self.probe(row, col+1)
             for i in range(max(row-1, 0), min(row+2, self.height)):
                 for j in range(max(col-1, 0), min(col+2, self.width)):
-                    if self.grid_actual[i][j] > 0 and self.grid_actual[i][j] < 9:
+                    if 0 < self.grid_actual[i][j] < 9:
                         self.grid[i][j] = self.grid_actual[i][j]
             if self.win():
                 self.playing = False
-                print("Every remaining spot is a bomb. You win!")
+                print("\n\n" + str(self))
+                print("\nEvery remaining spot is a bomb. You win!")
         # if neither of the above cases is true, all we have to do is set the grid square to the actual
 
     def win(self):
         flag = True
         for row in range(self.height):
             for col in range(self.width):
-                if self.grid[row][col] == -1 or self.grid[row][col] == -2:
+                if (self.grid[row][col] == -1 and self.grid_actual[row][col] != 9) or (self.grid[row][col] == -2 and self.grid_actual[row][col] != 9):
                     flag = False
         return flag
