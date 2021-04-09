@@ -29,7 +29,7 @@ class Board:
             col = input("Choose column: ")
             if "m" in row or "m" in col:
                 if self.grid[int(row[0])][int(col[0])] == -1:
-                    self.grid[int(row[0])][int(col[0])] = -2        # -2 for marked bombed (appear as a +)
+                    self.grid[int(row[0])][int(col[0])] = -2        # -2 for marked bombed (it will appear as a X when printed)
                 else:
                     print("\nYou can only mark unknown spots!")
             else:
