@@ -16,7 +16,7 @@ def load_board(testcase_path):
     with open(testcase_path) as f:
         data = json.load(f)
 
-        dims = data['size'].split(',')
+        dims = data['dim'].split(',')
         height = int(dims[0])
         width = int(dims[1])
 
@@ -26,7 +26,7 @@ def load_board(testcase_path):
 
         bombCount = int(data['bombs'])
 
-        grid = data['grid']
+        grid = data['board']
 
         return Board(width, height, startX, startY, bombCount, grid)
 
