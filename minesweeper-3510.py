@@ -34,4 +34,4 @@ def load_board(testcase_path):
 # Main method
 if __name__ == "__main__":
     board = load_board(testcase)
-    board.user_mode()
+    print(board.AI1())
