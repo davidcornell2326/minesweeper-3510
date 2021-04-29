@@ -88,7 +88,8 @@ class Board:
                 if results is not None:
                     return results
             print(self)
-            input("Press enter to continue the AI")
+            # input("Press enter to continue the AI")
+            print("Press enter to continue the AI")
             print("\n\n")
 
         return AI1.run(self)

@@ -10,7 +10,7 @@ import time
 ########################################################################################################################
 
 
-testcase = "./testcases/standard_boards/varied_size/40x_25y_10d_0.json"
+testcase = "./testcases/standard_boards/varied_size_boards/25rows_40cols_10d_0.json"
 # testcase = "./testcases/deterministic_board.json"
 
 def load_board(testcase_path):
