@@ -10,8 +10,8 @@ import time
 ########################################################################################################################
 
 
-testcase = "./testcases/standard_boards/varied_size/10x_10y_10d_0.json"
-
+# testcase = "./testcases/standard_boards/varied_size/10x_10y_10d_0.json"
+testcase = "./testcases/deterministic_board.json"
 
 def load_board(testcase_path):
     with open(testcase_path) as f:
@@ -36,7 +36,7 @@ def load_board(testcase_path):
 if __name__ == "__main__":
     board = load_board(testcase)
     start_time = time.time()
-    print(board.AI1())
+    print(board.AI2())
     end_time = time.time()
     print("\n")
     print("Milliseconds of execution:", 1000*(end_time - start_time))

@@ -1,4 +1,5 @@
 from AI1 import AI1
+from AI2 import AI2
 
 class Board:
     def __init__(self, width, height, start_x, start_y, bomb_count, grid_string):
@@ -68,6 +69,28 @@ class Board:
             print("\n\n")
 
         # return AI1.run(self)
+
+    def AI2(self):
+        print("Starting AI1\n")
+        ai2 = AI2(self)
+        while self.playing:
+            row,col = ai2.get_choice()
+            if "m" in row or "m" in col:
+                if self.grid[int(row[0])][int(col[0])] == -1:
+                    self.grid[int(row[0])][int(col[0])] = -2        # -2 for marked bombed (it will appear as a X when printed)
+                elif self.grid[int(row[0])][int(col[0])] == -2:
+                    self.grid[int(row[0])][int(col[0])] = -1    # un-mark
+                else:
+                    print("\nYou can only mark unknown spots!")
+            else:
+                results = self.probe(int(row), int(col))
+                if results is not None:
+                    return results
+            print(self)
+            input("Press enter to continue the AI")
+            print("\n\n")
+
+        return AI1.run(self)
 
     def probe(self, row, col):
         if self.grid[row][col] >= 0:    # can't probe if square is already revealed
