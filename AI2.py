@@ -8,7 +8,7 @@ class Variable:
         self.constraints = set()
 
     def remove_from_constraints(self, ai2):
-        for constraint in self.constraints:
+        for constraint in self.constraints.copy():
             if self in constraint.variables:
                 constraint.variables.remove(self)
                 constraint.target -= self.value
@@ -31,9 +31,11 @@ class Constraint:
 
     def update_variables(self, ai2):
         if self.target == 0:
-            for variable in self.variables:
+            for variable in self.variables.copy():
                 variable.value = 0
-                ai2.safe_queue.append((variable.posX, variable.posY, ""))
+                var_tuple = (variable.posX, variable.posY, "")
+                if variable in ai2.unprobed and var_tuple not in ai2.safe_queue:
+                    ai2.safe_queue.append(var_tuple)
                 if self in variable.constraints:
                     variable.constraints.remove(self)
                     variable.remove_from_constraints(ai2)
@@ -41,9 +43,11 @@ class Constraint:
             if self in ai2.constraints:
                 ai2.constraints.remove(self)
         elif self.target == len(self.variables):
-            for variable in self.variables:
+            for variable in self.variables.copy():
                 variable.value = 1
-                ai2.mine_queue.append((variable.posX, variable.posY, "m"))
+                var_tuple = (variable.posX, variable.posY, "m")
+                if variable in ai2.unprobed and var_tuple not in ai2.mine_queue:
+                    ai2.mine_queue.append(var_tuple)
                 if self in variable.constraints:
                     variable.constraints.remove(self)
                     variable.remove_from_constraints(ai2)
@@ -283,9 +287,13 @@ class AI2:
         #   the constraint set and return to step 1
 
         for mine in guaranteed_mine:
-            self.mine_queue.append((mine.posX, mine.posY, "m"))
+            mine_tuple = (mine.posX, mine.posY, "m")
+            if mine in self.unprobed and mine_tuple not in self.mine_queue:
+                self.mine_queue.append(mine_tuple)
         for safe in guaranteed_safe:
-            self.safe_queue.append((safe.posX, safe.posY, ""))
+            safe_tuple = (safe.posX, safe.posY, "")
+            if safe in self.unprobed and safe_tuple not in self.safe_queue:
+                self.safe_queue.append(safe_tuple)
 
         if ret:
             self.update_csp(ret[0], ret[1], "m" == ret[2])
