@@ -1,5 +1,6 @@
 import json
 from Board import Board
+import time
 
 ########################################################################################################################
 #                                                                                                                      #
@@ -34,4 +35,8 @@ def load_board(testcase_path):
 # Main method
 if __name__ == "__main__":
     board = load_board(testcase)
+    start_time = time.time()
     print(board.AI1())
+    end_time = time.time()
+    print("\n")
+    print("Milliseconds of execution:", 1000*(end_time - start_time))

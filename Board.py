@@ -52,18 +52,19 @@ class Board:
             print(self)
             print("")
             row,col = ai1.get_choice()
-            if "m" in row or "m" in col:
-                if self.grid[int(row[0])][int(col[0])] == -1:
-                    self.grid[int(row[0])][int(col[0])] = -2        # -2 for marked bombed (it will appear as a X when printed)
-                elif self.grid[int(row[0])][int(col[0])] == -2:
-                    self.grid[int(row[0])][int(col[0])] = -1    # un-mark
+            if "m" in row:  # marking mine case
+                if self.grid[int(row[0:len(row)-1])][int(col)] == -1:
+                    self.grid[int(row[0:len(row)-1])][int(col)] = -2        # -2 for marked bombed (it will appear as a X when printed)
+                elif self.grid[int(row[0:len(row)-1])][int(col)] == -2:
+                    self.grid[int(row[0:len(row)-1])][int(col)] = -1    # un-mark (will never be used by AI1)
                 else:
                     print("\nYou can only mark unknown spots!")
             else:
                 results = self.probe(int(row), int(col))
                 if results is not None:
                     return results
-            input("Press enter to have the AI submit this choice")
+            # input("Press enter to have the AI submit this choice")
+            print("Press enter to have the AI submit this choice")
             print("\n\n")
 
         # return AI1.run(self)
@@ -89,7 +90,6 @@ class Board:
             #     for j in range(max(col-1, 0), min(col+2, self.width)):
             #         if 0 < self.grid_actual[i][j] < 9:
             #             self.grid[i][j] = self.grid_actual[i][j]
-        print(self.win())
         if self.win() is not None:
             self.playing = False
             print("\n\n" + str(self))
