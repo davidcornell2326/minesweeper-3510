@@ -1,3 +1,5 @@
+import random
+
 class Variable:
     def __init__(self, posX, posY):
         self.value = "unk"
@@ -32,18 +34,22 @@ class Constraint:
             for variable in self.variables:
                 variable.value = 0
                 ai2.safe_queue.append((variable.posX, variable.posY, ""))
-                variable.constraints.remove(self)
-                variable.remove_from_constraints(ai2)
+                if self in variable.constraints:
+                    variable.constraints.remove(self)
+                    variable.remove_from_constraints(ai2)
             self.variables = set()
-            ai2.constraints.remove(self)
+            if self in ai2.constraints:
+                ai2.constraints.remove(self)
         elif self.target == len(self.variables):
             for variable in self.variables:
                 variable.value = 1
                 ai2.mine_queue.append((variable.posX, variable.posY, "m"))
-                variable.constraints.remove(self)
-                variable.remove_from_constraints(ai2)
+                if self in variable.constraints:
+                    variable.constraints.remove(self)
+                    variable.remove_from_constraints(ai2)
             self.variables = set()
-            ai2.constraints.remove(self)
+            if self in ai2.constraints:
+                ai2.constraints.remove(self)
 
     def remove_subset(self, constraint, ai2):
         for variable in constraint.variables:
@@ -79,12 +85,17 @@ class AI2:
         self.safe_queue = []
         self.mine_queue = []
         self.vboard = []
+        self.unprobed = set()
         for y in range(board.height):
             self.vboard.append([])
             for x in range(board.width):
-                self.vboard[y].append(Variable(x, y))
+                new_var = Variable(x, y)
+                self.vboard[y].append(new_var)
+                self.unprobed.add(new_var)
         self.constraints = set()
         self.move_queue = []
+        self.remaining_bombs = self.board.bomb_count
+        self.remaining_spaces = self.board.width * self.board.height
 
     def add_constraint(self, x, y):
         variables, sub = getAdjacentVariables(x, y, self.vboard)
@@ -107,11 +118,14 @@ class AI2:
                 constr.remove_subset(constraint, self)
 
     def update_csp(self, x, y, flagging):
-        print(self.board.grid_actual[y][x])
+        self.remaining_spaces -= 1
+        self.unprobed.remove(self.vboard[y][x])
         if self.board.grid_actual[y][x] == 9:
+            self.remaining_bombs -= 1
             self.vboard[y][x].value = 1
         elif flagging:
             print("DEBUG: ALGORITHM MADE A MISTAKE FLAGGING!!")
+            self.remaining_bombs -= 1
             self.vboard[y][x].value = 1
         else:
             self.vboard[y][x].value = 0
@@ -123,6 +137,43 @@ class AI2:
             if constraint is not None and len(constraint.variables) > 0:
                 self.check_constraint(constraint)
 
+    # Checks solution does not YET violate constraints
+    def verify_soln_possible(self, const_list):
+        for constraint in const_list:
+            curr = constraint.target
+            for variable in constraint.variables:
+                if not variable.value == "unk":
+                    curr -= variable.value
+            if curr < 0:
+                return False
+        return True
+
+    # Checks solution satisfies the constraints
+    def vertify_soln_valid(self, const_list):
+        for constraint in const_list:
+            curr = constraint.target
+            for variable in constraint.variables:
+                curr -= variable.value
+            if not curr == 0:
+                return False
+        return True
+
+    def generate_solutions(self, var_list, const_list, mine_list, solns=[]):
+        if len(var_list) == 0:
+            if self.vertify_soln_valid(const_list):
+                solns.append(mine_list)
+            return
+        curr = var_list.pop(0)
+        curr.value = 1
+        if self.verify_soln_possible(const_list):
+            self.generate_solutions(var_list, const_list, mine_list + [curr], solns)
+        curr.value = 0
+        if self.verify_soln_possible(const_list):
+            self.generate_solutions(var_list, const_list, mine_list, solns)
+        curr.value = "unk"
+        var_list.insert(0, curr)
+
+
     def get_choice(self):
         if self.board.first_move:
             self.board.first_move = False
@@ -130,9 +181,8 @@ class AI2:
 
             self.add_constraint(self.board.start_x, self.board.start_y)
 
-            print(self.safe_queue)
-            print(self.mine_queue)
-            print(self.constraints)
+            self.remaining_spaces -= 1
+            self.unprobed.remove(self.vboard[self.board.start_y][self.board.start_x])
 
             return str(self.board.start_y), str(self.board.start_x)  # return safe starting choice if on first move
 
@@ -191,13 +241,84 @@ class AI2:
                 visit_queue.append(next(iter(unvisited)))
             i += 1
 
-        print(variable_sets)
-        print(constraint_sets)
+        proposed_mine_clusters = []
+        probabilities = {}
+        for var_set, const_set in zip(variable_sets, constraint_sets):
+            solns = []
+            self.generate_solutions(list(var_set), list(const_set), [], solns)
+            proposed_mine_clusters.append(solns)
+            for variable in var_set:
+                probabilities[variable] = 0.0
+
+        # TODO This is where we could implement checking if any of the proposed solutions have too many mines
+
+        guaranteed_mine = []
+        guaranteed_safe = []
+        min_probability = 1.1
+        best_pick = None
+        # Compute the probability that each position is safe or has a mine based on proposed solutions
+        for var_set, solns in zip(variable_sets, proposed_mine_clusters):
+            for soln in solns:
+                for variable in soln:
+                    probabilities[variable] += 1
+            for variable in var_set:
+                probabilities[variable] /= len(solns)
+                if probabilities[variable] == 0.0:
+                    guaranteed_safe.append(variable)
+                if probabilities[variable] == 1.0:
+                    guaranteed_mine.append(variable)
+                if probabilities[variable] < min_probability:
+                    min_probability = probabilities[variable]
+                    best_pick = variable
+
+        ret = None
+        if len(guaranteed_mine) > 0:
+            m = guaranteed_mine.pop(0)
+            ret = (m.posX, m.posY, "m")
+        elif len(guaranteed_safe) > 0:
+            s = guaranteed_safe.pop(0)
+            ret = (s.posX, s.posY, "")
 
         # Step 4: If the solution set has any guaranteed mines then mark them.  If there are gauranteed free spaces we can probe them and add them to
         #   the constraint set and return to step 1
 
+        for mine in guaranteed_mine:
+            self.mine_queue.append((mine.posX, mine.posY, "m"))
+        for safe in guaranteed_safe:
+            self.safe_queue.append((safe.posX, safe.posY, ""))
+
+        if ret:
+            self.update_csp(ret[0], ret[1], "m" == ret[2])
+            return str(ret[1]) + ret[2], str(ret[0])
+        print(probabilities)
+
         # Step 5: If there are no guarantees pick the square with the lowest probability of being a mine across all proposed solutions
 
-        # Step 6: If the lowest probability is higher than just guessing randomly then actually randomly guess instead**
-        #   Random comes with a caveat that corners are better and tiles with overlapping variables in the constraint are better
+        random_prob = self.remaining_bombs / self.remaining_spaces
+        print(random_prob)
+
+        # We have found a spot that is better than random guessing
+        if min_probability <= random_prob:
+            self.update_csp(best_pick.posX, best_pick.posY, False)
+            return str(best_pick.posY), str(best_pick.posX)
+        else: # We have to pick randomly
+
+            # Step 6: If the lowest probability is higher than just guessing randomly then actually randomly guess instead**
+            #   Random comes with a caveat that corners are better and tiles with overlapping variables in the constraint are better
+            rem_corners = []
+            if self.vboard[0][0] in self.unprobed:
+                rem_corners.append((0, 0))
+            if self.vboard[self.board.height - 1][0] in self.unprobed:
+                rem_corners.append((0, self.board.height - 1))
+            if self.vboard[0][self.board.width - 1] in self.unprobed:
+                rem_corners.append((self.board.width - 1, 0))
+            if self.vboard[self.board.height - 1][self.board.width - 1] in self.unprobed:
+                rem_corners.append((self.board.width - 1, self.board.height - 1))
+            if len(rem_corners) > 0:
+                corner = random.choice(rem_corners)
+                self.update_csp(corner[0], corner[1], False)
+                return str(corner[1]), str(corner[0])
+            else:
+                spot = random.sample(self.unprobed, 1)[0]
+                self.update_csp(spot.posX, spot.posY, False)
+                return str(spot.posY), str(spot.posX)
