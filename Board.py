@@ -75,11 +75,12 @@ class Board:
         ai2 = AI2(self)
         while self.playing:
             row,col = ai2.get_choice()
-            if "m" in row or "m" in col:
-                if self.grid[int(row[0])][int(col[0])] == -1:
-                    self.grid[int(row[0])][int(col[0])] = -2        # -2 for marked bombed (it will appear as a X when printed)
-                elif self.grid[int(row[0])][int(col[0])] == -2:
-                    self.grid[int(row[0])][int(col[0])] = -1    # un-mark
+            if "m" in row:  # marking mine case
+                if self.grid[int(row[0:len(row) - 1])][int(col)] == -1:
+                    self.grid[int(row[0:len(row) - 1])][
+                        int(col)] = -2  # -2 for marked bombed (it will appear as a X when printed)
+                elif self.grid[int(row[0:len(row) - 1])][int(col)] == -2:
+                    self.grid[int(row[0:len(row) - 1])][int(col)] = -1  # un-mark
                 else:
                     print("\nYou can only mark unknown spots!")
             else:
