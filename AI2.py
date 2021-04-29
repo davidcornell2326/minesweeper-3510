@@ -128,7 +128,7 @@ class AI2:
             self.remaining_bombs -= 1
             self.vboard[y][x].value = 1
         elif flagging:
-            print("DEBUG: ALGORITHM MADE A MISTAKE FLAGGING!!")
+            # print("DEBUG: ALGORITHM MADE A MISTAKE FLAGGING!!")
             self.remaining_bombs -= 1
             self.vboard[y][x].value = 1
         else:
@@ -208,9 +208,9 @@ class AI2:
 
             self.update_csp(x, y, move[2] == "m")
 
-            print(self.safe_queue)
-            print(self.mine_queue)
-            print(self.constraints)
+            # print(self.safe_queue)
+            # print(self.mine_queue)
+            # print(self.constraints)
 
             return str(move[1]) + str(move[2]), str(move[0])
 
@@ -298,12 +298,12 @@ class AI2:
         if ret:
             self.update_csp(ret[0], ret[1], "m" == ret[2])
             return str(ret[1]) + ret[2], str(ret[0])
-        print(probabilities)
+        # print(probabilities)
 
         # Step 5: If there are no guarantees pick the square with the lowest probability of being a mine across all proposed solutions
 
         random_prob = self.remaining_bombs / self.remaining_spaces
-        print(random_prob)
+        # print(random_prob)
 
         # We have found a spot that is better than random guessing
         if min_probability <= random_prob:

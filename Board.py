@@ -70,7 +70,7 @@ class Board:
             # print("\n\n")
 
     def AI2(self):
-        print("Starting AI1\n")
+        # print("Starting AI1\n")
         ai2 = AI2(self)
         while self.playing:
             row,col = ai2.get_choice()
@@ -81,15 +81,16 @@ class Board:
                 elif self.grid[int(row[0:len(row) - 1])][int(col)] == -2:
                     self.grid[int(row[0:len(row) - 1])][int(col)] = -1  # un-mark
                 else:
-                    print("\nYou can only mark unknown spots!")
+                    # print("\nYou can only mark unknown spots!")
+                    pass
             else:
                 results = self.probe(int(row), int(col))
                 if results is not None:
                     return results
-            print(self)
+            # print(self)
             # input("Press enter to continue the AI")
-            print("Press enter to continue the AI")
-            print("\n\n")
+            # print("Press enter to continue the AI")
+            # print("\n\n")
 
     def probe(self, row, col):
         if self.grid[row][col] >= 0:    # can't probe if square is already revealed

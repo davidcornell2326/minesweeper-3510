@@ -42,8 +42,8 @@ if __name__ == "__main__":
     for filename in os.listdir(directory):
         board = load_board(directory + "/" + filename)
         start_time = time.time()
-        print(board.AI1())
-        # print(board.AI2())
+        # print(board.AI1())
+        print(board.AI2())
         end_time = time.time()
         print("\n")
         print("Milliseconds of execution:", 1000*(end_time - start_time))
