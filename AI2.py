@@ -7,8 +7,9 @@ class Variable:
 
     def remove_from_constraints(self, ai2):
         for constraint in self.constraints:
-            constraint.variables.remove(self)
-            constraint.target -= self.value
+            if self in constraint.variables:
+                constraint.variables.remove(self)
+                constraint.target -= self.value
             constraint.update_variables(ai2)
         self.constraints = set()
 
