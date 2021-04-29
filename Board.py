@@ -15,6 +15,7 @@ class Board:
         self.grid = [[-1 for _ in range(self.width)] for _ in range(self.height)]       # -1 represents unknown (will show up as a * when printed)
         self.playing = True     # True while game is ongoing
         self.first_move = True
+        self.num_probes = 0
 
     def __repr__(self):
         return "\n".join([self.grid_string[i:i+self.width] for i in range(0, len(self.grid_string), self.width)])
@@ -49,6 +50,7 @@ class Board:
         ai1 = AI1(self)
         while self.playing:
             print(self)
+            print("")
             row,col = ai1.get_choice()
             if "m" in row or "m" in col:
                 if self.grid[int(row[0])][int(col[0])] == -1:
@@ -61,15 +63,16 @@ class Board:
                 results = self.probe(int(row), int(col))
                 if results is not None:
                     return results
-            input("Press enter to continue the AI")
+            input("Press enter to have the AI submit this choice")
             print("\n\n")
 
-        return AI1.run(self)
+        # return AI1.run(self)
 
     def probe(self, row, col):
         if self.grid[row][col] >= 0:    # can't probe if square is already revealed
             return
         actual_square = self.grid_actual[row][col]
+        self.num_probes += 1
         self.grid[row][col] = actual_square
         if actual_square == 9:
             print("That was a bomb! Play will continue")
@@ -86,24 +89,32 @@ class Board:
             #     for j in range(max(col-1, 0), min(col+2, self.width)):
             #         if 0 < self.grid_actual[i][j] < 9:
             #             self.grid[i][j] = self.grid_actual[i][j]
+        print(self.win())
         if self.win() is not None:
             self.playing = False
             print("\n\n" + str(self))
-            print("\nEvery remaining spot is a bomb. You win!")
+            print("\nEvery remaining spot is a bomb. Algorithm terminates!")
+            print("Number of squares revealed (NOT counting marked mines that weren't actually chosen:", self.num_probes, "/", self.width * self.height)
+            print("Bomb locations (listed as (row, col) with (0,0) as top left):")
             return self.win()
         else:
             return None
         # if neither of the above cases is true, all we have to do is set the grid square to the actual
 
     def win(self): # returns list of (row, col) bomb locations if win, None if else
-        possible_return_spaces = []
+        known_bombs = []
+        unknown_spots = []
         for row in range(self.height):
             for col in range(self.width):
                 # Count revealed bombs and unknown spaces:
-                if self.grid[row][col] == -1 or self.grid[row][col] == -2 or self.grid[row][col] == 9:
-                    possible_return_spaces.append((row,col))
-        if len(possible_return_spaces) == self.bomb_count:
-            return possible_return_spaces
+                if self.grid[row][col] == -2 or self.grid[row][col] == 9:
+                    known_bombs.append((row,col))
+                if self.grid[row][col] == -1:
+                    unknown_spots.append((row,col))
+        if len(known_bombs) == self.bomb_count:
+            return known_bombs
+        if len(known_bombs) + len(unknown_spots) == self.bomb_count:
+            return known_bombs + unknown_spots
         else:
             return None
 

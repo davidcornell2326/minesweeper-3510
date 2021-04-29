@@ -9,7 +9,7 @@ from Board import Board
 ########################################################################################################################
 
 
-testcase = "./testcases/deterministic_board.json"
+testcase = "./testcases/standard_boards/varied_size/10x_10y_10d_0.json"
 
 
 def load_board(testcase_path):
