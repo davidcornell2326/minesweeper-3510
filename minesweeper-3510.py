@@ -1,6 +1,8 @@
 import json
 from Board import Board
 import time
+import os
+import pprint
 
 ########################################################################################################################
 #                                                                                                                      #
@@ -22,8 +24,8 @@ def load_board(testcase_path):
         width = int(dims[1])
 
         startPos = data['safe'].split(',')
-        startX = int(startPos[0])
-        startY = int(startPos[1])
+        startY = int(startPos[0])
+        startX = int(startPos[1])
 
         bombCount = int(data['bombs'])
 
@@ -34,9 +36,15 @@ def load_board(testcase_path):
 
 # Main method
 if __name__ == "__main__":
-    board = load_board(testcase)
-    start_time = time.time()
-    print(board.AI2())
-    end_time = time.time()
-    print("\n")
-    print("Milliseconds of execution:", 1000*(end_time - start_time))
+
+    directory = "./testcases/standard_boards/varied_size_boards"
+    # directory = "./testcases/standard_boards/varied_density_boards"
+    for filename in os.listdir(directory):
+        board = load_board(directory + "/" + filename)
+        start_time = time.time()
+        print(board.AI1())
+        # print(board.AI2())
+        end_time = time.time()
+        print("\n")
+        print("Milliseconds of execution:", 1000*(end_time - start_time))
+

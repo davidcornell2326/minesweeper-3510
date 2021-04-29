@@ -47,11 +47,11 @@ class Board:
             print("\n\n")
 
     def AI1(self):
-        print("Starting AI1\n")
+        # print("Starting AI1\n")
         ai1 = AI1(self)
         while self.playing:
-            print(self)
-            print("")
+            # print(self)
+            # print("")
             row,col = ai1.get_choice()
             if "m" in row:  # marking mine case
                 if self.grid[int(row[0:len(row)-1])][int(col)] == -1:
@@ -60,15 +60,14 @@ class Board:
                     self.grid[int(row[0:len(row)-1])][int(col)] = -1    # un-mark (will never be used by AI1)
                 else:
                     print("\nYou can only mark unknown spots!")
+                    pass
             else:
                 results = self.probe(int(row), int(col))
                 if results is not None:
                     return results
             # input("Press enter to have the AI submit this choice")
-            print("Press enter to have the AI submit this choice")
-            print("\n\n")
-
-        # return AI1.run(self)
+            # print("Press enter to have the AI submit this choice")
+            # print("\n\n")
 
     def AI2(self):
         print("Starting AI1\n")
@@ -92,8 +91,6 @@ class Board:
             print("Press enter to continue the AI")
             print("\n\n")
 
-        return AI1.run(self)
-
     def probe(self, row, col):
         if self.grid[row][col] >= 0:    # can't probe if square is already revealed
             return
@@ -101,7 +98,8 @@ class Board:
         self.num_probes += 1
         self.grid[row][col] = actual_square
         if actual_square == 9:
-            print("That was a bomb! Play will continue")
+            # print("That was a bomb! Play will continue")
+            pass
         # elif actual_square == 0:
             # if row > 0:
             #     self.probe(row-1, col)
@@ -117,10 +115,10 @@ class Board:
             #             self.grid[i][j] = self.grid_actual[i][j]
         if self.win() is not None:
             self.playing = False
-            print("\n\n" + str(self))
-            print("\nEvery remaining spot is a bomb. Algorithm terminates!")
+            # print("\n\n" + str(self))
+            # print("\nEvery remaining spot is a bomb. Algorithm terminates!")
             print("Number of squares revealed (NOT counting marked mines that weren't actually chosen:", self.num_probes, "/", self.width * self.height)
-            print("Bomb locations (listed as (row, col) with (0,0) as top left):")
+            # print("Bomb locations (listed as (row, col) with (0,0) as top left):")
             return self.win()
         else:
             return None
