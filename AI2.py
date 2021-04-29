@@ -142,6 +142,12 @@ class AI2:
         elif len(self.safe_queue) > 0:
             queue = self.safe_queue
 
+        # Step 1: Look through every space on the board and define a constraint such that the NUMBER revealed by the space
+        #  is equal to the true value of the bomb/empty space around that tile
+
+        # Step 2: Try to simplify the constraints by seeing if any sets of variables fit completely within another set of constraints
+        #   If any of the constraints become trivial begin probing again like in step 1
+
         if len(queue) > 0:
             move = queue.pop(0)
             x, y = move[0], move[1]
@@ -154,15 +160,39 @@ class AI2:
 
             return str(move[1]) + str(move[2]), str(move[0])
 
-        # Step 1: Look through every space on the board and define a constraint such that the NUMBER revealed by the space
-        #  is equal to the true value of the bomb/empty space around that tile
-
-        # Step 2: Try to simplify the constraints by seeing if any sets of variables fit completely within another set of constraints
-        #   If any of the constraints become trivial begin probing again like in step 1
-
         # Step 3: Group constraints that share variables and use backtracking to find solutions for those clusters.  Now look at how many mines
         #   each of these clusters requires for their solutions and make sure it adds up with the remaining mines in the game (even when combined
         #   with other clusters)
+
+        # This would be a good place to use the Union Find Data structure to improve time complexity
+        # For now perform bfs on the constraints to find connected components
+        visited_vars = set()
+        unvisited = self.constraints.copy()
+        visit_queue = [next(iter(unvisited))]
+        i = 0
+        variable_sets = []
+        constraint_sets = []
+        while len(unvisited) > 0:
+            variable_sets.append(set())
+            constraint_sets.append(set())
+            while len(visit_queue) > 0:
+                curr = visit_queue.pop(0)
+                if curr in unvisited:
+                    unvisited.remove(curr)
+                    for variable in curr.variables:
+                        if variable not in visited_vars:
+                            variable_sets[i].add(variable)
+                            visited_vars.add(variable)
+                            for constraint in variable.constraints:
+                                if constraint in unvisited:
+                                    visit_queue.append(constraint)
+                                    constraint_sets[i].add(constraint)
+            if len(unvisited) > 0:
+                visit_queue.append(next(iter(unvisited)))
+            i += 1
+
+        print(variable_sets)
+        print(constraint_sets)
 
         # Step 4: If the solution set has any guaranteed mines then mark them.  If there are gauranteed free spaces we can probe them and add them to
         #   the constraint set and return to step 1
