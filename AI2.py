@@ -177,16 +177,30 @@ class AI2:
         curr.value = "unk"
         var_list.insert(0, curr)
 
+    def pick_random_smart(self):
+        rem_corners = []
+        if self.vboard[0][0] in self.unprobed:
+            rem_corners.append((0, 0))
+        if self.vboard[self.board.height - 1][0] in self.unprobed:
+            rem_corners.append((0, self.board.height - 1))
+        if self.vboard[0][self.board.width - 1] in self.unprobed:
+            rem_corners.append((self.board.width - 1, 0))
+        if self.vboard[self.board.height - 1][self.board.width - 1] in self.unprobed:
+            rem_corners.append((self.board.width - 1, self.board.height - 1))
+        if len(rem_corners) > 0:
+            corner = random.choice(rem_corners)
+            self.update_csp(corner[0], corner[1], False)
+            return str(corner[1]), str(corner[0])
+        else:
+            spot = random.sample(self.unprobed, 1)[0]
+            self.update_csp(spot.posX, spot.posY, False)
+            return str(spot.posY), str(spot.posX)
+
 
     def get_choice(self):
         if self.board.first_move:
             self.board.first_move = False
-            self.vboard[self.board.start_y][self.board.start_x].value = 0
-
-            self.add_constraint(self.board.start_x, self.board.start_y)
-
-            self.remaining_spaces -= 1
-            self.unprobed.remove(self.vboard[self.board.start_y][self.board.start_x])
+            self.update_csp(self.board.start_x, self.board.start_y, False)
 
             return str(self.board.start_y), str(self.board.start_x)  # return safe starting choice if on first move
 
@@ -222,6 +236,9 @@ class AI2:
         # For now perform bfs on the constraints to find connected components
         visited_vars = set()
         unvisited = self.constraints.copy()
+        if len(unvisited) == 0:
+            return self.pick_random_smart()
+
         visit_queue = [next(iter(unvisited))]
         i = 0
         variable_sets = []
@@ -313,20 +330,4 @@ class AI2:
 
             # Step 6: If the lowest probability is higher than just guessing randomly then actually randomly guess instead**
             #   Random comes with a caveat that corners are better and tiles with overlapping variables in the constraint are better
-            rem_corners = []
-            if self.vboard[0][0] in self.unprobed:
-                rem_corners.append((0, 0))
-            if self.vboard[self.board.height - 1][0] in self.unprobed:
-                rem_corners.append((0, self.board.height - 1))
-            if self.vboard[0][self.board.width - 1] in self.unprobed:
-                rem_corners.append((self.board.width - 1, 0))
-            if self.vboard[self.board.height - 1][self.board.width - 1] in self.unprobed:
-                rem_corners.append((self.board.width - 1, self.board.height - 1))
-            if len(rem_corners) > 0:
-                corner = random.choice(rem_corners)
-                self.update_csp(corner[0], corner[1], False)
-                return str(corner[1]), str(corner[0])
-            else:
-                spot = random.sample(self.unprobed, 1)[0]
-                self.update_csp(spot.posX, spot.posY, False)
-                return str(spot.posY), str(spot.posX)
+            return self.pick_random_smart()

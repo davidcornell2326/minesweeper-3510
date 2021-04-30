@@ -12,7 +12,8 @@ import pprint
 ########################################################################################################################
 
 
-testcase = "./testcases/standard_boards/varied_size_boards/25rows_40cols_10d_0.json"
+# testcase = "./testcases/standard_boards/varied_size_boards/25rows_40cols_10d_0.json"
+testcase = "./testcases/standard_boards/varied_density_boards/20x_20y_14d_3.json"
 # testcase = "./testcases/deterministic_board.json"
 
 def load_board(testcase_path):
@@ -37,14 +38,25 @@ def load_board(testcase_path):
 # Main method
 if __name__ == "__main__":
 
-    directory = "./testcases/standard_boards/varied_size_boards"
-    # directory = "./testcases/standard_boards/varied_density_boards"
+    # directory = "./testcases/standard_boards/varied_size_boards"
+    directory = "./testcases/standard_boards/varied_density_boards"
     for filename in os.listdir(directory):
         board = load_board(directory + "/" + filename)
+        print(filename)
         start_time = time.time()
         # print(board.AI1())
         print(board.AI2())
         end_time = time.time()
         print("\n")
         print("Milliseconds of execution:", 1000*(end_time - start_time))
+
+
+    # board = load_board(testcase)
+    # start_time = time.time()
+    # # print(board.AI1())
+    # print(board.AI2())
+    # end_time = time.time()
+    # print("\n")
+    # print("Milliseconds of execution:", 1000*(end_time - start_time))
+
 
