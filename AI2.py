@@ -324,8 +324,6 @@ class AI2:
             for variable in var_set:
                 probabilities[variable] = 0.0
 
-        # TODO This is where we could implement checking if any of the proposed solutions have too many mines
-
         guaranteed_mine = []
         guaranteed_safe = []
         min_probability = 1.1
