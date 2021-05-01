@@ -25,7 +25,7 @@ class Board:
         top = "    " + " ".join(str(i) for i in range(self.width)) + "\n   " + "-" * self.width * 2 + "\n"
         return top + "\n".join(str(i) + " | " + str(" ".join(str(self.grid[i][j] if self.grid[i][j] > -1 else ("*" if self.grid[i][j] == -1 else "X")) for j in range(self.width))) for i in range(self.height))
 
-    def user_mode(self):
+    def user_mode(self):    # this is the mode that lets the user play each round
         print("\nChoose a spot to \"click\" by entering the row and then column where prompted.")
         print("Add the letter \"m\" to the end of either of the two numbers to \"mark\" that spot instead of clicking it.")
         print("\nStarting spot: row " + str(self.start_x) + ", column " + str(self.start_y) + "\n")
@@ -46,7 +46,7 @@ class Board:
                     return results
             print("\n\n")
 
-    def AI1(self):
+    def AI1(self):      # this mode has AI1 make a decision for each move of the game until it terminates
         # print("Starting AI1\n")
         ai1 = AI1(self)
         while self.playing:
@@ -69,7 +69,7 @@ class Board:
             # print("Press enter to have the AI submit this choice")
             # print("\n\n")
 
-    def AI2(self):
+    def AI2(self):      # this mode has AI2 make a decision for each move of the game until it terminates
         # print("Starting AI1\n")
         ai2 = AI2(self)
         while self.playing:
@@ -92,7 +92,7 @@ class Board:
             # print("Press enter to continue the AI")
             # print("\n\n")
 
-    def probe(self, row, col):
+    def probe(self, row, col):      # probe (reveal) a square (i.e. "make a move" that is not just marking a square as a mine)
         if self.grid[row][col] >= 0:    # can't probe if square is already revealed
             return
         actual_square = self.grid_actual[row][col]
