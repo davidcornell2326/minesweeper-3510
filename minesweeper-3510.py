@@ -12,9 +12,7 @@ import pprint
 ########################################################################################################################
 
 
-# testcase = "./testcases/standard_boards/varied_size_boards/25rows_40cols_10d_0.json"
-testcase = "./testcases/standard_boards/varied_density_boards/20x_20y_14d_3.json"
-# testcase = "./testcases/deterministic_board.json"
+
 
 def load_board(testcase_path):
     with open(testcase_path) as f:
@@ -41,32 +39,101 @@ if __name__ == "__main__":
     directory = "./testcases/standard_boards/varied_size_boards"
     # directory = "./testcases/standard_boards/varied_density_boards"
 
-    r = open("outputRuntimes.txt", "a")
+    testcase = "./testcases/standard_boards/varied_size_boards/10rows_10cols_10d_0.json"
 
-    for filename in os.listdir(directory):
-        board = load_board(directory + "/" + filename)
-        # print(filename)
+    print("Minesweeper Project by Michael Ryan, David Cornell, and Josh Rosenthal")
+    print("\nPLEASE READ README.MD BEFORE RUNNING ANY FILES")
+    input("Press enter to continue (make sure the terminal is selected and the cursor is at the end of this line)")
+    print("\nChoose one of the following run options:")
+    print("\n1: Do a full run of a single test case with AI1, with details shown (change the testcase by modifying the testcase variable in minesweeper-3510.py)")
+    print("\n2: Do a full run of a single test case with AI2, with details shown (change the testcase by modifying the testcase variable in minesweeper-3510.py)")
+    print("\n3: Run ALL varied size testcases for AI1, with only results shown")
+    print("\n4: Run ALL varied mine density testcases for AI1, with only results shown")
+    print("\n5: Run ALL varied size testcases for AI2, with only results shown")
+    print("\n6: Run ALL varied mine density testcases for AI2, with only results shown")
+    # note: option 7 is the mode that will write the results to a file for our analysis purposes (should not be an option for the grading TA)
+    choice = int(input("\nEnter a number and then press enter to continue: "))
+
+    if choice == 1:
+        board = load_board(testcase)
         start_time = time.time()
-
-        board.AI1()
-        # board.AI2()
-
-        # print(board.AI1())
-        # print(board.AI2())
+        print(board.AI1(True))
         end_time = time.time()
-        # print("\n")
-        # print("Milliseconds of execution:", 1000 * (end_time - start_time))
+        print("\n")
+        print("Milliseconds of execution:", 1000 * (end_time - start_time))
 
-        r.write(str(1000 * (end_time - start_time)) + "\t")
+    if choice == 2:
+        board = load_board(testcase)
+        start_time = time.time()
+        print(board.AI2(True))
+        end_time = time.time()
+        print("\n")
+        print("Milliseconds of execution:", 1000 * (end_time - start_time))
 
-    r.close()
+    if choice == 3:
+        directory = "./testcases/standard_boards/varied_size_boards"
+        for filename in os.listdir(directory):
+            print(filename)
+            board = load_board(directory + "/" + filename)
+            start_time = time.time()
+            print(board.AI1(False))
+            end_time = time.time()
+            print("")
+            print("Milliseconds of execution:", 1000 * (end_time - start_time))
+            print("\n\n")
 
-    # board = load_board(testcase)
-    # start_time = time.time()
-    # # print(board.AI1())
-    # print(board.AI2())
-    # end_time = time.time()
-    # print("\n")
-    # print("Milliseconds of execution:", 1000*(end_time - start_time))
+    if choice == 4:
+        directory = "./testcases/standard_boards/varied_density_boards"
+        for filename in os.listdir(directory):
+            print(filename)
+            board = load_board(directory + "/" + filename)
+            start_time = time.time()
+            print(board.AI1(False))
+            end_time = time.time()
+            print("")
+            print("Milliseconds of execution:", 1000 * (end_time - start_time))
+            print("\n\n")
 
+    if choice == 5:
+        directory = "./testcases/standard_boards/varied_size_boards"
+        for filename in os.listdir(directory):
+            print(filename)
+            board = load_board(directory + "/" + filename)
+            start_time = time.time()
+            print(board.AI2(False))
+            end_time = time.time()
+            print("")
+            print("Milliseconds of execution:", 1000 * (end_time - start_time))
+            print("\n\n")
 
+    if choice == 6:
+        directory = "./testcases/standard_boards/varied_density_boards"
+        for filename in os.listdir(directory):
+            print(filename)
+            board = load_board(directory + "/" + filename)
+            start_time = time.time()
+            print(board.AI2(False))
+            end_time = time.time()
+            print("")
+            print("Milliseconds of execution:", 1000 * (end_time - start_time))
+            print("\n\n")
+
+    if choice == 7:
+        r = open("outputRuntimes.txt", "a")
+        for filename in os.listdir(directory):
+            board = load_board(directory + "/" + filename)
+            # print(filename)
+            start_time = time.time()
+
+            board.AI1(False)
+            # board.AI2(False)
+
+            # print(board.AI1())
+            # print(board.AI2())
+            end_time = time.time()
+            # print("\n")
+            # print("Milliseconds of execution:", 1000 * (end_time - start_time))
+
+            r.write(str(1000 * (end_time - start_time)) + "\t")
+
+        r.close()

@@ -25,7 +25,7 @@ class Board:
         top = "    " + " ".join(str(i) for i in range(self.width)) + "\n   " + "-" * self.width * 2 + "\n"
         return top + "\n".join(str(i) + " | " + str(" ".join(str(self.grid[i][j] if self.grid[i][j] > -1 else ("*" if self.grid[i][j] == -1 else "X")) for j in range(self.width))) for i in range(self.height))
 
-    def user_mode(self):
+    def user_mode(self):        # allows the user to play the game by entering a choice for each move
         print("\nChoose a spot to \"click\" by entering the row and then column where prompted.")
         print("Add the letter \"m\" to the end of either of the two numbers to \"mark\" that spot instead of clicking it.")
         print("\nStarting spot: row " + str(self.start_x) + ", column " + str(self.start_y) + "\n")
@@ -41,39 +41,44 @@ class Board:
                 else:
                     print("\nYou can only mark unknown spots!")
             else:
-                results = self.probe(int(row), int(col))
+                results = self.probe(int(row), int(col), True)
                 if results is not None:
                     return results
             print("\n\n")
 
-    def AI1(self):
-        #print("Starting AI 1")
+    def AI1(self, details):      # has AI1 play the game by returning a choice for each move
+        if details:
+            print("Starting AI 1")
         ai1 = AI1(self)
         while self.playing:
-            # print(self)
-            # print("")
-            row,col = ai1.get_choice()
+            if details:
+                print(self)
+                print("")
+            row,col = ai1.get_choice(details)
             if "m" in row:  # marking mine case
                 if self.grid[int(row[0:len(row)-1])][int(col)] == -1:
                     self.grid[int(row[0:len(row)-1])][int(col)] = -2        # -2 for marked bombed (it will appear as a X when printed)
                 elif self.grid[int(row[0:len(row)-1])][int(col)] == -2:
                     self.grid[int(row[0:len(row)-1])][int(col)] = -1    # un-mark (will never be used by AI1)
                 else:
-                    print("\nYou can only mark unknown spots!")
+                    if details:
+                        print("\nYou can only mark unknown spots!")
                     pass
             else:
-                results = self.probe(int(row), int(col))
+                results = self.probe(int(row), int(col), details)
                 if results is not None:
                     return results
             # input("Press enter to have the AI submit this choice")
             # print("Press enter to have the AI submit this choice")
-            # print("\n\n")
+            if details:
+                print("\n\n")
 
-    def AI2(self):
-        #print("Starting AI 2")
+    def AI2(self, details):    # has AI2 play the game by returning a choice for each move
+        if details:
+            print("Starting AI 2")
         ai2 = AI2(self)
         while self.playing:
-            row,col = ai2.get_choice()
+            row,col = ai2.get_choice(details)
             if "m" in row:  # marking mine case
                 if self.grid[int(row[0:len(row) - 1])][int(col)] == -1:
                     self.grid[int(row[0:len(row) - 1])][
@@ -81,25 +86,28 @@ class Board:
                 elif self.grid[int(row[0:len(row) - 1])][int(col)] == -2:
                     self.grid[int(row[0:len(row) - 1])][int(col)] = -1  # un-mark
                 else:
-                    # print("\nYou can only mark unknown spots!")
+                    if details:
+                        print("\nYou can only mark unknown spots!")
                     pass
             else:
-                results = self.probe(int(row), int(col))
+                results = self.probe(int(row), int(col), details)
                 if results is not None:
                     return results
-            # print(self)
-            # input("Press enter to continue the AI")
-            # print("Press enter to continue the AI")
-            # print("\n\n")
+            if details:
+                print(self)
+                # input("Press enter to continue the AI")
+                # print("Press enter to continue the AI")
+                print("\n\n")
 
-    def probe(self, row, col):
+    def probe(self, row, col, details):      # reveal/probe a square (make an actual move that is not just marking a mine)
         if self.grid[row][col] >= 0:    # can't probe if square is already revealed
             return
         actual_square = self.grid_actual[row][col]
         self.num_probes += 1
         self.grid[row][col] = actual_square
         if actual_square == 9:
-            # print("That was a bomb! Play will continue")
+            if details:
+                print("That was a bomb! Play will continue")
             pass
         # elif actual_square == 0:
             # if row > 0:
@@ -116,15 +124,16 @@ class Board:
             #             self.grid[i][j] = self.grid_actual[i][j]
         if self.win() is not None:
             self.playing = False
-            # print("\n\n" + str(self))
-            # print("\nEvery remaining spot is a bomb. Algorithm terminates!")
+            if details:
+                print("\n\n" + str(self))
+                print("\nEvery mine has been found, and/or every remaining spot is a mine. Algorithm terminates!")
 
             p = open("outputPerformance.txt", "a")
             p.write(str(self.num_probes / (self.width * self.height)) + "\t")
             p.close()
 
-            # print("Number of squares revealed (NOT counting marked mines that weren't actually chosen:", self.num_probes / (self.width * self.height))
-            # print("Bomb locations (listed as (row, col) with (0,0) as top left):")
+            print("Portion of squares revealed (NOT counting marked mines that weren't actually chosen:", self.num_probes / (self.width * self.height))
+            print("Mine locations (listed as (row, col) with (0,0) as top left):")
             return self.win()
         else:
             return None
@@ -154,3 +163,7 @@ class Board:
                 if i != row or j != col:
                     surrounding_squares.append((i, j))
         return surrounding_squares
+
+# Main method
+if __name__ == "__main__":
+    print("If you're seeing this, please read README.MD!!!")

@@ -6,10 +6,11 @@ class AI1:
         self.safe_squares = []
         self.mine_squares = []
 
-    def get_choice(self):   # returns row,col choice as strings (so that the "m" can be included)
+    def get_choice(self, details):   # returns row,col choice as strings (so that the "m" can be included)
         if self.board.first_move:
             self.board.first_move = False
-            # print("AI1's next choice: " + str(self.board.start_y),str(self.board.start_x) + " (first move)")
+            if details:
+                print("AI1's next choice: " + str(self.board.start_y),str(self.board.start_x) + " (first move)")
             return str(self.board.start_y),str(self.board.start_x)      # return safe starting choice if on first move
 
         # step 1: process current board with new information
@@ -24,15 +25,18 @@ class AI1:
         if len(self.mine_squares) > 0:
             square = self.mine_squares[0]
             del self.mine_squares[0]
-            # print("AI1's next choice: " + str(square[0]) + "m", str(square[1]) + " (marking a known mine)")
+            if details:
+                print("AI1's next choice: " + str(square[0]) + "m", str(square[1]) + " (marking a known mine)")
             return str(square[0]) + "m", str(square[1])  # choose to mark a mine
         if len (self.safe_squares) > 0:
             square = self.safe_squares[0]
             del self.safe_squares[0]
-            # print("AI1's next choice: " + str(square[0]), str(square[1]) + " (guaranteed non-mine)")
+            if details:
+                print("AI1's next choice: " + str(square[0]), str(square[1]) + " (guaranteed non-mine)")
             return str(square[0]), str(square[1])  # choose to reveal/probe a safe square
         choice_r,choice_c = self.informed_random_selection()  # choose an informed random space if all else fails
-        # print("AI1's next choice: " + str(choice_r), str(choice_c) + " (informed, weighted random based on revealed squares)")
+        if details:
+            print("AI1's next choice: " + str(choice_r), str(choice_c) + " (informed, weighted random based on revealed squares)")
         return choice_r,choice_c
 
     def informed_random_selection(self):    # tries to choose a mine square based on a "votes" system of surrounding squares
@@ -88,3 +92,7 @@ class AI1:
         for r, c in surrounding_squares:
             if self.board.grid[r][c] == -1 and (r, c) not in self.mine_squares:
                 self.mine_squares.append((r, c))
+
+# Main method
+if __name__ == "__main__":
+    print("If you're seeing this, please read README.MD!!!")

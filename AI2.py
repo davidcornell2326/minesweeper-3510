@@ -125,6 +125,7 @@ class AI2:
         self.move_queue = []
         self.remaining_bombs = self.board.bomb_count
         self.remaining_spaces = self.board.width * self.board.height
+        self.details = False
 
     # Helper method to add a constraint at a specified (x,y) coordinate.  Also adds the new constraint to the constraint
     #  list for all variables in the constraint
@@ -172,6 +173,10 @@ class AI2:
             constraint = self.add_constraint(x, y)
             if constraint is not None and len(constraint.variables) > 0:
                 self.check_constraint(constraint)
+        if self.details:
+            print("Safe queue:", self.safe_queue)
+            print("Mine queue:", self.mine_queue)
+            print("Constraints:", self.constraints)
 
     # Checks if a possible solution does not YET violate constraints
     def verify_soln_possible(self, const_list):
@@ -234,7 +239,8 @@ class AI2:
             return str(spot.posY), str(spot.posX)
 
     # Returns the next choice of tile to mark or probe by the minesweeper algorithm
-    def get_choice(self):
+    def get_choice(self, details):
+        self.details = details
         # If it is the first move we just return the safe space and add its constraints
         if self.board.first_move:
             self.board.first_move = False
@@ -262,10 +268,6 @@ class AI2:
 
             # Add the tile to the csp based on if it is meant to be a marked mine or a probed number tile
             self.update_csp(x, y, move[2] == "m")
-
-            # print(self.safe_queue)
-            # print(self.mine_queue)
-            # print(self.constraints)
 
             return str(move[1]) + str(move[2]), str(move[0])
 
@@ -386,3 +388,7 @@ class AI2:
             # Step 6: If the lowest probability is higher than just guessing randomly then actually randomly guess instead**
             #   Random comes with a caveat that corners are better and tiles with overlapping variables in the constraint are better
             return self.pick_random_smart()
+
+# Main method
+if __name__ == "__main__":
+    print("If you're seeing this, please read README.MD!!!")
