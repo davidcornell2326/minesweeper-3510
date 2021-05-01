@@ -47,7 +47,7 @@ class Board:
             print("\n\n")
 
     def AI1(self):
-        # print("Starting AI1\n")
+        #print("Starting AI 1")
         ai1 = AI1(self)
         while self.playing:
             # print(self)
@@ -70,7 +70,7 @@ class Board:
             # print("\n\n")
 
     def AI2(self):
-        # print("Starting AI1\n")
+        #print("Starting AI 2")
         ai2 = AI2(self)
         while self.playing:
             row,col = ai2.get_choice()
@@ -118,7 +118,12 @@ class Board:
             self.playing = False
             # print("\n\n" + str(self))
             # print("\nEvery remaining spot is a bomb. Algorithm terminates!")
-            print("Number of squares revealed (NOT counting marked mines that weren't actually chosen:", self.num_probes, "/", self.width * self.height)
+
+            p = open("outputPerformance.txt", "a")
+            p.write(str(self.num_probes / (self.width * self.height)) + "\t")
+            p.close()
+
+            # print("Number of squares revealed (NOT counting marked mines that weren't actually chosen:", self.num_probes / (self.width * self.height))
             # print("Bomb locations (listed as (row, col) with (0,0) as top left):")
             return self.win()
         else:

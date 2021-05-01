@@ -38,18 +38,28 @@ def load_board(testcase_path):
 # Main method
 if __name__ == "__main__":
 
-    # directory = "./testcases/standard_boards/varied_size_boards"
-    directory = "./testcases/standard_boards/varied_density_boards"
+    directory = "./testcases/standard_boards/varied_size_boards"
+    # directory = "./testcases/standard_boards/varied_density_boards"
+
+    r = open("outputRuntimes.txt", "a")
+
     for filename in os.listdir(directory):
         board = load_board(directory + "/" + filename)
-        print(filename)
+        # print(filename)
         start_time = time.time()
-        # print(board.AI1())
-        print(board.AI2())
-        end_time = time.time()
-        print("\n")
-        print("Milliseconds of execution:", 1000*(end_time - start_time))
 
+        board.AI1()
+        # board.AI2()
+
+        # print(board.AI1())
+        # print(board.AI2())
+        end_time = time.time()
+        # print("\n")
+        # print("Milliseconds of execution:", 1000 * (end_time - start_time))
+
+        r.write(str(1000 * (end_time - start_time)) + "\t")
+
+    r.close()
 
     # board = load_board(testcase)
     # start_time = time.time()
