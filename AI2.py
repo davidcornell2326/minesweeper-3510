@@ -1,5 +1,9 @@
 import random
 
+# A Class to Represent Variables in the Constraint Satisfaction Problem
+# A Variable in minesweeper is a tile which either has a known value of 0 or 1, or an unknown value (which
+#  is still in the domain of 0-1).  0 means an empty tile, while 1 means the tile has a mine.
+# Each variable has a value, and (x,y) pos, and a set of constraints which it is a part of (see Constraint below).
 class Variable:
     def __init__(self, posX, posY):
         self.value = "unk"
@@ -7,6 +11,9 @@ class Variable:
         self.posY = posY
         self.constraints = set()
 
+    # Loop through all the constraints that this variable is a part of and remove the variable from it (and subtract
+    #  the value of this variable from the constraints target count).  This may happen when the value of this variable
+    #  has been determined so it is no longer an uncertain "free" variable in a constraint.
     def remove_from_constraints(self, ai2):
         for constraint in self.constraints.copy():
             if self in constraint.variables:
@@ -15,20 +22,30 @@ class Variable:
             constraint.update_variables(ai2)
         self.constraints = set()
 
+    # Enables addition of known variables like A + B using addition operator
     def __add__(self, other):
         if type(other) is Variable:
             return self.value + other.value
         return self.value + other
 
+    # Returns string representation of variable
     def __repr__(self):
         return "(" + str(self.posX) + "," + str(self.posY) + ")"
 
 
+# A Class to represent Constraints in the Minesweeper Constraint Satisfaction Problem
+#  A Constraint in minesweeper arises when we know the value of a numbered tile and the unknown tiles surrounding it
+#  We can formulate an equation that VALUE = VAR1 + VAR2 + ...  When satisfied this equation will give us a potentially
+#  valid board configuration that satisfies the requirements of this number tile.  When all constraints are satisfied we
+#  have a potentially viable solution to the whole board.
 class Constraint:
     def __init__(self, target, variables):
         self.target = target
         self.variables = variables
 
+    # Loop through all the variables that this constraint has.  If the constraint has been reduced to 0 then all surrounding
+    #  tiles are safe.  If the constraint target is equal to the number of unknowns then they must all be mines.  Set the
+    #  variables and remove them from other constraints accordingly.
     def update_variables(self, ai2):
         if self.target == 0:
             for variable in self.variables.copy():
@@ -55,19 +72,25 @@ class Constraint:
             if self in ai2.constraints:
                 ai2.constraints.remove(self)
 
+    # If another constraint is a complete subset of this constraint then we should remove it from this constraint
+    #  and also subtract it's target value from this one.  For instance if 2 = VAR1 + VAR2 + VAR3 and 1 = VAR1 + VAR2
+    #  we could satisfy the first constraint to 1 = VAR3 (which of course we then could update the variables, etc.)
     def remove_subset(self, constraint, ai2):
         for variable in constraint.variables:
             self.variables.remove(variable)
         self.target -= constraint.target
         self.update_variables(ai2)
 
+    # Returns a string representation of the instance of the Constraint class.
     def __repr__(self):
         output = []
         for var in self.variables:
             output.append(str(var))
         return str(self.target) + " = " + " + ".join(output)
 
-
+# Loops through and returns all the surrounding tiles to a given (x,y) coordinate which have an unknown variable value.
+#  Also returns a count of the known variable values surrounding the tile so this can be subtracted from the numeric tile
+#  to get the target value of just the unknown tiles.
 def getAdjacentVariables(x, y, vboard):
     output = set()
     pre_def = 0
@@ -83,6 +106,8 @@ def getAdjacentVariables(x, y, vboard):
     return output, pre_def
 
 
+# A Class to implement a Minesweeper AI.  Given a board it will continue to return moves when get_choice() is called
+#  until the game is completed
 class AI2:
     def __init__(self, board):
         self.board = board
@@ -101,6 +126,8 @@ class AI2:
         self.remaining_bombs = self.board.bomb_count
         self.remaining_spaces = self.board.width * self.board.height
 
+    # Helper method to add a constraint at a specified (x,y) coordinate.  Also adds the new constraint to the constraint
+    #  list for all variables in the constraint
     def add_constraint(self, x, y):
         variables, sub = getAdjacentVariables(x, y, self.vboard)
         if len(variables) > 0:
@@ -112,6 +139,7 @@ class AI2:
             return constraint
         return None
 
+    # Checks if a constraint is a subset of any other constraint and removes the subset if it is
     def check_constraint(self, constraint):
         for constr in self.constraints.copy():
             if constr == constraint:
@@ -121,6 +149,10 @@ class AI2:
             elif constraint.variables.issubset(constr.variables) and len(constraint.variables) > 0:
                 constr.remove_subset(constraint, self)
 
+    # Updates the constraint satisfaction problem based on a new probed (x,y) position (and whether or not this was
+    #  flagging a mine or probing the spot for info).  Updates the remaining free spots and bombs, but also removes the
+    #  variable from constraints if it is in any since the value is known now, and adds a constraint in the current spot
+    #  if the current spot contains a number indicating the amount of surrounding mines
     def update_csp(self, x, y, flagging):
         self.remaining_spaces -= 1
         self.unprobed.remove(self.vboard[y][x])
@@ -141,7 +173,7 @@ class AI2:
             if constraint is not None and len(constraint.variables) > 0:
                 self.check_constraint(constraint)
 
-    # Checks solution does not YET violate constraints
+    # Checks if a possible solution does not YET violate constraints
     def verify_soln_possible(self, const_list):
         for constraint in const_list:
             curr = constraint.target
@@ -152,7 +184,7 @@ class AI2:
                 return False
         return True
 
-    # Checks solution satisfies the constraints
+    # Checks if a possible solution satisfies all the constraints in const_list
     def vertify_soln_valid(self, const_list):
         for constraint in const_list:
             curr = constraint.target
@@ -162,6 +194,9 @@ class AI2:
                 return False
         return True
 
+    # Recursive helper method to generate all possible solutions using variables in var_list that satisfy all
+    #  constraints in const_list.  Adds mines to mine_list and eventually adds solutions to solns.  Uses backtracking
+    #  to generate every possible solution.  Immediately stops backtracking chain when a constraint is dissatisfied.
     def generate_solutions(self, var_list, const_list, mine_list, solns=[]):
         if len(var_list) == 0:
             if self.vertify_soln_valid(const_list):
@@ -177,6 +212,8 @@ class AI2:
         curr.value = "unk"
         var_list.insert(0, curr)
 
+    # Pick a random tile "smartly".  For instance pick one of the corners and if this doesn't work at least pick a tile
+    #  we haven't probed yet
     def pick_random_smart(self):
         rem_corners = []
         if self.vboard[0][0] in self.unprobed:
@@ -196,14 +233,16 @@ class AI2:
             self.update_csp(spot.posX, spot.posY, False)
             return str(spot.posY), str(spot.posX)
 
-
+    # Returns the next choice of tile to mark or probe by the minesweeper algorithm
     def get_choice(self):
+        # If it is the first move we just return the safe space and add its constraints
         if self.board.first_move:
             self.board.first_move = False
             self.update_csp(self.board.start_x, self.board.start_y, False)
 
             return str(self.board.start_y), str(self.board.start_x)  # return safe starting choice if on first move
 
+        # Now we should check if we have a queue of mine tiles to mark or safe tiles to probe
         queue = []
         if len(self.mine_queue) > 0:
             queue = self.mine_queue
@@ -216,10 +255,12 @@ class AI2:
         # Step 2: Try to simplify the constraints by seeing if any sets of variables fit completely within another set of constraints
         #   If any of the constraints become trivial begin probing again like in step 1
 
+        # If we have a queue of tiles then lets handle those first
         if len(queue) > 0:
             move = queue.pop(0)
             x, y = move[0], move[1]
 
+            # Add the tile to the csp based on if it is meant to be a marked mine or a probed number tile
             self.update_csp(x, y, move[2] == "m")
 
             # print(self.safe_queue)
@@ -234,6 +275,13 @@ class AI2:
 
         # This would be a good place to use the Union Find Data structure to improve time complexity
         # For now perform bfs on the constraints to find connected components
+
+        # Here we didn't have any tiles that were known to be safe or mines so we are going to find solutions which
+        #  satisfy constraints.  Since this is a very expensive operation (using backtracking means we can have n! operations),
+        #  we should try to reduce the size of our problem.  To do this we will separate the solutions into clusters of
+        #  overlapping variables.  Not all constraints are connected so we can solve different constraint sets separately.
+        #  To find which sets of constraints are connected we perform a breadth first search where the constraints are
+        #  nodes and the variables are edges.  Then we form a list of sets of connected constraints/variables.
         visited_vars = set()
         unvisited = self.constraints.copy()
         if len(unvisited) == 0:
@@ -262,6 +310,9 @@ class AI2:
                 visit_queue.append(next(iter(unvisited)))
             i += 1
 
+        # Now that we have found a set of connected variables/constraints we must find the solutions that satisfy each
+        #  of these constraint clusters.  Loop through them generating solutions.  Also initialize a probability dict
+        #  to have zero probability that any of the tiles are mines in these constraints for now (to be updated later)
         proposed_mine_clusters = []
         probabilities = {}
         for var_set, const_set in zip(variable_sets, constraint_sets):
@@ -278,6 +329,7 @@ class AI2:
         min_probability = 1.1
         best_pick = None
         # Compute the probability that each position is safe or has a mine based on proposed solutions
+        # Basically check how many times each tile is safe and how many times it is a mine across all possible solutions
         for var_set, solns in zip(variable_sets, proposed_mine_clusters):
             for soln in solns:
                 for variable in soln:
@@ -292,6 +344,8 @@ class AI2:
                     min_probability = probabilities[variable]
                     best_pick = variable
 
+        # Probability 1 = guaranteed mine
+        # Probability 0 = guaranteed safe
         ret = None
         if len(guaranteed_mine) > 0:
             m = guaranteed_mine.pop(0)
@@ -319,10 +373,11 @@ class AI2:
 
         # Step 5: If there are no guarantees pick the square with the lowest probability of being a mine across all proposed solutions
 
+        # compute the probability that a random tile (with absolutely no insight into the csp) has a mine
         random_prob = self.remaining_bombs / self.remaining_spaces
         # print(random_prob)
 
-        # We have found a spot that is better than random guessing
+        # We have found a spot that is better than random guessing so pick that
         if min_probability <= random_prob:
             self.update_csp(best_pick.posX, best_pick.posY, False)
             return str(best_pick.posY), str(best_pick.posX)
